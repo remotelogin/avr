@@ -15,15 +15,15 @@ OBJ=$(TARGET).o
 HEX=$(TARGET).hex
 
 # Flags
-CFLAGS=-Os -DF_CPU=$(F_CPU) -mmcu=$(MCU) -std=c++11
+CFLAGS=-Os -DF_CPU=$(F_CPU) -mmcu=$(MCU) -std=c99
 
 all: $(HEX)
 
-$(OBJ): $(TARGET).cpp
-	avr-g++ $(CFLAGS) -c -o $@ $<
+$(OBJ): $(TARGET).c
+	avr-gcc $(CFLAGS) -c -o $@ $<
 
 $(HEX): $(OBJ)
-	avr-g++ $(CFLAGS) -o $(TARGET).elf $(OBJ)
+	avr-gcc $(CFLAGS) -o $(TARGET).elf $(OBJ)
 	$(OBJCOPY) -O ihex -R .eeprom $(TARGET).elf $@
 
 upload: $(HEX)
