@@ -19,4 +19,12 @@
 
 int main() {
   //uart_trap();
+  s_led_properties properties;
+  properties.col_rgb = 0;
+  properties.col_rgb = ~0;
+  properties.data_pin = 12;
+  s_led_strip_setup setup;
+  setup.num_leds = 5;
+  
+  ledloop_trap(&properties, &setup);
 }
