@@ -1,7 +1,5 @@
 #include "uart_console.h"
 #include <avr/io.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <util/delay.h>
 
 #ifndef F_CPU
@@ -14,8 +12,8 @@
 #include <util/setbaud.h>
 
 #include "minled.h"
-#include "cus_string.h"
 #include "uart_console.h"
+#include "newminled.h"
 
 int main() {
   //uart_trap();
@@ -26,5 +24,6 @@ int main() {
   s_led_strip_setup setup;
   setup.num_leds = 5;
   
-  ledloop_trap(&properties, &setup);
-}
+  //ledloop_trap(&properties, &setup);
+  newledtrap();
+  }

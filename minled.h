@@ -43,7 +43,7 @@ unsigned int props_to_bytes(s_led_properties *properties) {
 
 void send_reset_sig() {
   PORTB &= ~(1 << PB4);
-  _delay_us(60);
+  _delay_us(50);
   PORTB |= (1 << PB4);
 }
 
@@ -67,39 +67,63 @@ void send_reset_sig() {
   }
   }*/
 
+/*
+void sendByte(uint8_t byte) {
+    for (uint8_t i = 0; i < 8; i++) {
+        if (byte & 0x80) {
+            // Send '1'
+            PORTB |= (1 << LED_PIN);
+            __asm__
+__volatile__("nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t"::);
+            PORTB &= ~(1 << LED_PIN);
+            __asm__ __volatile__("nop\n\t""nop\n\t""nop\n\t"::);
+        } else {
+            // Send '0'
+            PORTB |= (1 << LED_PIN);
+            __asm__ __volatile__("nop\n\t""nop\n\t""nop\n\t"::);
+            PORTB &= ~(1 << LED_PIN);
+            __asm__
+__volatile__("nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t"::);
+        }
+        byte <<= 1;
+    }
+}
+*/
+
 void send_single_led(s_led_properties *properties) {
     uint32_t color = properties->col_rgb;
     
     for (int i = 23; i >= 0; i--) {
         if (color & (1UL << i)) {
-            PORTB |= (1 << PB4);  // High
-            __asm__ __volatile__ (
-                "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" 
-                "nop\n\t" "nop\n\t"
-            );
-            PORTB &= ~(1 << PB4); // Low
-            __asm__ __volatile__ (
-                "nop\n\t" "nop\n\t"
-            );
+	  PORTB |= (1 << PB4);  // High
+	  __asm__ __volatile__ (
+				"nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" 
+				"nop\n\t" "nop\n\t"::
+				);
+	  PORTB &= ~(1 << PB4); // Low
+	  __asm__ __volatile__ (
+				"nop\n\t" "nop\n\t" "nop\n\t"::
+				);
         } else {
             PORTB |= (1 << PB4);  // High
             __asm__ __volatile__ (
-                "nop\n\t"
+				  "nop\n\t" "nop\n\t" "nop\n\t"::
             );
             PORTB &= ~(1 << PB4); // Low
             __asm__ __volatile__ (
                 "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" 
-                "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t"
+                "nop\n\t"::
             );
         }
     }
 }
 
 void send_full_strip(s_led_properties* properties, s_led_strip_setup* setup) {
-  send_reset_sig();
   for(int i = 0; i < setup->num_leds; i++ ) {
     send_single_led(properties);
   }
+  send_reset_sig();
+  _delay_ms(1000);
 }
 
 void ledloop_trap(s_led_properties *properties, s_led_strip_setup* setup) {
